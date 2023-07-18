@@ -1,7 +1,11 @@
 import torch
 import torch.nn as nn
 import math
-import embedding as em
+
+import sys
+sys.path.append('../Transformer')
+import embeddings.embedding as em
+
 
 class MultiHeadAttention(nn.Module):
 
