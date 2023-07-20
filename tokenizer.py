@@ -11,7 +11,7 @@ special_tokens=["[UNK]", "[PAD]", "[SOS]", "[EOS]"]
 
 def load_sentences(dataset, split):
     for data in dataset: 
-        yield data[split]
+        yield data['translation'][split]
 
 def load_tokenizer(tokenizer_algo, dataset, split, config):
     if tokenizer_algo == 'BPE':
@@ -24,7 +24,7 @@ def load_tokenizer(tokenizer_algo, dataset, split, config):
         tokenizer = Tokenizer(WordLevel(unk_token=unk_token))
         trainer = WordLevelTrainer(special_tokens=special_tokens)
     else:
-        raise Exception("Tokenizer algorithm is not found")
+        raise ValueError("Tokenizer algorithm is not found")
     
     tokenizer_path = Path(config['tokenizer_file'].format(split))
     if not Path.exists(tokenizer_path):
