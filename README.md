@@ -3,6 +3,11 @@ An implementation of Transformer architecture in PyTorch
 
 ### Done
 - Embeddings
-
+- Encoder
+- Decoder
+- Tokenizer
+- Transfomer
+- Input processing
 ### ToDo (next step)
-- Multi-head attention
+- Training step
+- Validation step
