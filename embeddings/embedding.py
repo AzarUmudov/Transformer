@@ -36,15 +36,3 @@ class InputEmbedding(nn.Module):
     def forward(self, x):
         x = self.embedding(x) * math.sqrt(self.d_model)
         return x
-        
-def main():
-    random_tokens = torch.randint(low=0, high=5000, size=(6,)).unsqueeze(0)
-    inp_emb = InputEmbedding(5000, 512)(random_tokens)
-    print(f'Input embedding shape: {inp_emb.shape}')
-    pos_emb = PositionEncoding(d_model=512, seq_len=6, dropout=0.1)(inp_emb)
-    print(f'Positional embedding shape: {pos_emb.shape}')
-
-
-if __name__=="__main__":
-    main()
-

@@ -2,3 +2,10 @@
 __pycache__/
 *.py[cod]
 *$py.class
+
+# model's params
+runs/
+weights/
+
+# dataset
+*.json

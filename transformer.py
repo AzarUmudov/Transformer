@@ -1,8 +1,8 @@
 import torch
 import torch.nn as nn
 
-from encoder import Encoder, EncoderBlock
-from decoder import Decoder, DecoderBlock
+from modules.encoder import Encoder, EncoderBlock
+from modules.decoder import Decoder, DecoderBlock
 from embeddings.embedding import PositionEncoding, InputEmbedding
 from blocks.attention import MultiHeadAttention
 from blocks.position_wise_fnn import PositionWiseFNN
@@ -14,11 +14,11 @@ class Transformer(nn.Module):
         self.dec_input_embedding = InputEmbedding(vocab_size=trg_vocab_size, d_model=d_model)
         self.position_encoding = PositionEncoding(seq_len=seq_len, d_model=d_model, dropout=dropout)
 
-        encoder_block = EncoderBlock(MultiHeadAttention(d_model=d_model, h=h),
+        encoder_block = EncoderBlock(seq_len, MultiHeadAttention(d_model=d_model, h=h),
                                     PositionWiseFNN(d_model=d_model, d_ff=d_ff, dropout=dropout))
         self.encoder = Encoder(nn.ModuleList([encoder_block for _ in range(num_encoder)]))
 
-        decoder_block = DecoderBlock(MultiHeadAttention(d_model=d_model, h=h),
+        decoder_block = DecoderBlock(seq_len, MultiHeadAttention(d_model=d_model, h=h),
                                      MultiHeadAttention(d_model=d_model, h=h),
                                      PositionWiseFNN(d_model=d_model, d_ff=d_ff, dropout=dropout))
         self.decoder = Decoder(nn.ModuleList([decoder_block for _ in range(num_decoder)]))
@@ -38,5 +38,5 @@ class Transformer(nn.Module):
 
     def linear_layer(self, x):
         x = self.layer(x)
-        x = nn.Softmax(x, dim=-1)
+        x = torch.softmax(x, dim=-1)
         return x

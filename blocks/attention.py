@@ -32,17 +32,10 @@ class MultiHeadAttention(nn.Module):
         attention = (query @ key.transpose(-2, -1))/math.sqrt(self.d_model)
 
         if mask is not None:
-            attention.masked_fill_(mask==0, '-1e9')
+            attention.masked_fill_(mask==0, -1e9)
             
         attention = torch.softmax(attention, dim=-1) @ value 
         attention = attention.transpose(1,2).reshape(attention.shape[0], -1, self.d_k*self.h)
         x = self.wo(attention)
         return x
     
-
-atn = MultiHeadAttention(512, 8)
-random_tokens = torch.randint(low=0, high=5000, size=(6,)).unsqueeze(0)
-inp_emb = em.InputEmbedding(5000, 512)(random_tokens)
-pos_emb = em.PositionEncoding(d_model=512, seq_len=6, dropout=0.1)(inp_emb)
-x = atn(pos_emb, pos_emb, pos_emb)
-print(f'Attention output: {x.shape}')

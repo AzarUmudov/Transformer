@@ -5,11 +5,11 @@ from blocks.position_wise_fnn import PositionWiseFNN
 
 class EncoderBlock(nn.Module):
 
-    def __init__(self, multi_head_attention: MultiHeadAttention, feed_forward: PositionWiseFNN) -> None:
+    def __init__(self, seq_len: int, multi_head_attention: MultiHeadAttention, feed_forward: PositionWiseFNN) -> None:
         super().__init__()
         self.multi_head_attention = multi_head_attention
         self.feed_forward = feed_forward
-        self.layer_norm = nn.LayerNorm()
+        self.layer_norm = nn.LayerNorm(normalized_shape=(seq_len, multi_head_attention.d_model))
     
     def forward(self, x, src_mask):
         x = self.layer_norm(x + self.multi_head_attention(x, x, x, src_mask))

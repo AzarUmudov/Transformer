@@ -13,7 +13,7 @@ class PositionWiseFNN(nn.Module):
         self.layer2 = nn.Linear(in_features=d_ff, out_features=d_model)
     
     def forward(self, x):
-        x = nn.Relu(self.layer1(x))
+        x = torch.relu(self.layer1(x))
         x = self.layer2(self.dropout(x))
         return x
 
