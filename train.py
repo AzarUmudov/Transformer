@@ -29,6 +29,7 @@ def train(config):
         model.train()
         iterator = tqdm(train_loader, desc=f'Epoch {epoch}: ')
         for batch in iterator:
+            
             optimizer.zero_grad()
 
             encoder_input = batch['encoder_input'].to(device)
@@ -49,7 +50,9 @@ def train(config):
             loss.backward()
             optimizer.step()
             steps += 1
-        
+            
+        validation(model, val_loader, output_tokenizer, config['seq_len'], device)
+
         save_obj = {
             'epoch':epoch,
             'optimizer_state_dict': optimizer.state_dict(),
@@ -58,6 +61,39 @@ def train(config):
         }
         model_filepath = get_weights_path(config)
         torch.save(save_obj, model_filepath)
+
+def validation(model, val_dataset, output_tokenizer, max_length, device, num_examples=3):
+    model.eval()
+    start = output_tokenizer.token_to_id('[SOS]')
+    end = output_tokenizer.token_to_id('[SOS]')
+    count = 0 
+    with torch.no_grad():
+        for batch in val_dataset:
+            encoder_input = batch['encoder_input'].to(device)
+            encoder_mask = batch['encoder_mask'].to(device)
+
+            encoder_output = model.encode(encoder_input, encoder_mask)
+            decoder_input = torch.empty(1,1).type_as(encoder_input).fill_(start).to(device)
+            while True:
+                if decoder_input.size(1) == max_length:
+                    break 
+                
+                decoder_mask = torch.triu(torch.ones(1, decoder_input.size(1), decoder_input.size(1)), diagonal=1).int() == 0
+                decoder_output = model.decode(decoder_input, encoder_output, encoder_mask, decoder_mask)
+                token = torch.max(model.linear_layer(decoder_output[:, -1]), dim=1)[1]
+                decoder_input = torch.cat([decoder_input, torch.empty(1,1).type_as(encoder_input).fill_(token.item()).to(device)], dim=1)
+                
+                if token == end:
+                    break 
+
+            prediction_text = output_tokenizer.decode(decoder_input.squeeze(0).detach().cpu().numpy())
+            print("Source: ", batch['input_text'])
+            print("Target: ", batch['output_text'])
+            print("Prediction: ", prediction_text)
+            count += 1
+        
+            if count == num_examples:
+                break      
 
 if __name__ == "__main__":
     warnings.filterwarnings("ignore")

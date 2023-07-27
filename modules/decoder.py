@@ -2,6 +2,7 @@ import torch
 import torch.nn as nn
 from blocks.attention import MultiHeadAttention
 from blocks.position_wise_fnn import PositionWiseFNN
+from blocks.layer_normalization import LayerNormalization
 
 class DecoderBlock(nn.Module):
 
@@ -10,11 +11,11 @@ class DecoderBlock(nn.Module):
         self.multi_head_attention = multi_head_attention
         self.cross_head_attention = cross_head_attention
         self.feed_forward = feed_forward
-        self.layer_norm = nn.LayerNorm(normalized_shape=(seq_len, multi_head_attention.d_model))
+        self.layer_norm = LayerNormalization()
     
     def forward(self, x, encoder_output, src_mask, target_mask):
-        x = self.layer_norm(x + self.multi_head_attention(x, x, x, src_mask))
-        x = self.layer_norm(x + self.cross_head_attention(x, encoder_output, encoder_output, target_mask))
+        x = self.layer_norm(x + self.multi_head_attention(x, x, x, target_mask))
+        x = self.layer_norm(x + self.cross_head_attention(x, encoder_output, encoder_output, src_mask))
         x = self.layer_norm(x + self.feed_forward(x))
         return x
     

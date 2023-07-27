@@ -29,7 +29,7 @@ class MultiHeadAttention(nn.Module):
         key = key.view(key.shape[0], key.shape[1], self.h, self.d_k).transpose(1, 2)
         value = value.view(value.shape[0], value.shape[1], self.h, self.d_k).transpose(1, 2)
 
-        attention = (query @ key.transpose(-2, -1))/math.sqrt(self.d_model)
+        attention = (query @ key.transpose(-2, -1))/math.sqrt(query.shape[-1])
 
         if mask is not None:
             attention.masked_fill_(mask==0, -1e9)

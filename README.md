@@ -8,6 +8,9 @@ An implementation of Transformer architecture in PyTorch
 - Tokenizer
 - Transfomer
 - Input processing
-### ToDo (next step)
 - Training step
 - Validation step
+
+### ToDo (next step)
+Currently, decoder picks the next token based on greedy search
+- Add a beam search  
