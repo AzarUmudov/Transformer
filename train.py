@@ -82,6 +82,7 @@ def validation(model, val_dataset, output_tokenizer, max_length, device, writer,
                     break 
                 
                 decoder_mask = torch.triu(torch.ones(1, decoder_input.size(1), decoder_input.size(1)), diagonal=1).int() == 0
+                decoder_mask = decoder_mask.to(device)
                 decoder_output = model.decode(decoder_input, encoder_output, encoder_mask, decoder_mask)
                 token = torch.max(model.linear_layer(decoder_output[:, -1]), dim=1)[1]
                 decoder_input = torch.cat([decoder_input, torch.empty(1,1).type_as(encoder_input).fill_(token.item()).to(device)], dim=1)
