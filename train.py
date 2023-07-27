@@ -90,13 +90,13 @@ def validation(model, val_dataset, output_tokenizer, max_length, device, writer,
                     break 
 
             prediction_text = output_tokenizer.decode(decoder_input.squeeze(0).detach().cpu().numpy())
-            expected.append(batch['output_text']))
+            expected.append(batch['output_text'])
             predicted.append(prediction_text)
             count += 1
         
             if count == num_examples:
                 break      
-            
+
         metric = torchmetrics.BLEUScore()
         bleu = metric(predicted, expected)
         writer.add_scalar('BLEU score', bleu, steps)
