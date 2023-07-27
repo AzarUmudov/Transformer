@@ -7,6 +7,7 @@ from torch.utils.tensorboard import SummaryWriter
 from tqdm import tqdm 
 from config import get_config, get_weights_path
 import warnings
+import torchmetrics
 
 def get_model(config, src_len, tgt_len):
     model = Transformer(seq_len=config['seq_len'], src_vocab_size=src_len, trg_vocab_size=tgt_len, d_model=config['d_model'],
@@ -50,8 +51,8 @@ def train(config):
             loss.backward()
             optimizer.step()
             steps += 1
-            
-        validation(model, val_loader, output_tokenizer, config['seq_len'], device)
+
+        validation(model, val_loader, output_tokenizer, config['seq_len'], device, writer, steps)
 
         save_obj = {
             'epoch':epoch,
@@ -62,11 +63,13 @@ def train(config):
         model_filepath = get_weights_path(config)
         torch.save(save_obj, model_filepath)
 
-def validation(model, val_dataset, output_tokenizer, max_length, device, num_examples=3):
+def validation(model, val_dataset, output_tokenizer, max_length, device, writer, steps, num_examples=3):
     model.eval()
     start = output_tokenizer.token_to_id('[SOS]')
     end = output_tokenizer.token_to_id('[SOS]')
     count = 0 
+    predicted = []
+    expected = []
     with torch.no_grad():
         for batch in val_dataset:
             encoder_input = batch['encoder_input'].to(device)
@@ -87,13 +90,17 @@ def validation(model, val_dataset, output_tokenizer, max_length, device, num_exa
                     break 
 
             prediction_text = output_tokenizer.decode(decoder_input.squeeze(0).detach().cpu().numpy())
-            print("Source: ", batch['input_text'])
-            print("Target: ", batch['output_text'])
-            print("Prediction: ", prediction_text)
+            expected.append(batch['output_text']))
+            predicted.append(prediction_text)
             count += 1
         
             if count == num_examples:
                 break      
+            
+        metric = torchmetrics.BLEUScore()
+        bleu = metric(predicted, expected)
+        writer.add_scalar('BLEU score', bleu, steps)
+        writer.flush()
 
 if __name__ == "__main__":
     warnings.filterwarnings("ignore")
