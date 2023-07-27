@@ -9,10 +9,8 @@ An implementation of Transformer architecture in PyTorch
 - Transformer
 - Input processing
 - Training step
-### ToDo (next step)
-
 - Validation step
 
 ### ToDo (next step)
-Currently, decoder picks the next token based on greedy search
+Currently, the decoder picks the next token based on a greedy search
 - Add a beam search  
