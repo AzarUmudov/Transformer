@@ -6,9 +6,11 @@ An implementation of Transformer architecture in PyTorch
 - Encoder
 - Decoder
 - Tokenizer
-- Transfomer
+- Transformer
 - Input processing
 - Training step
+### ToDo (next step)
+
 - Validation step
 
 ### ToDo (next step)
