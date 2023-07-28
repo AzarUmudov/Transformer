@@ -15,9 +15,9 @@ class PositionEncoding(nn.Module):
         
         position_encoding[:, 0::2] = torch.sin(position_encoding[:, 0::2])
         position_encoding[:, 1::2] = torch.cos(position_encoding[:, 1::2])
-        self.position_encoding = position_encoding.unsqueeze(0)
+        position_encoding = position_encoding.unsqueeze(0)
 
-        self.register_buffer(name='positional_encoding', tensor=position_encoding)
+        self.register_buffer(name='position_encoding', tensor=position_encoding)
 
     def forward(self, x):
         x = x + (self.position_encoding[:, :x.shape[1], :]).requires_grad_(False)
