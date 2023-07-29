@@ -60,7 +60,7 @@ def train(config):
             'model_state_dict': optimizer.state_dict(),
             'global_step': steps
         }
-        model_filepath = get_weights_path(config)
+        model_filepath = get_weights_path(config, epoch)
         torch.save(save_obj, model_filepath)
 
 def validation(model, val_dataset, output_tokenizer, max_length, device, writer, steps, num_examples=3):

@@ -22,4 +22,4 @@ def get_config(seq_len):
     }
 
 def get_weights_path(config, epoch):
-    return str(Path('.')/config['model_folder']/f"{config['model_filname']}{epoch}.pt")
+    return str(Path('.')/config['model_folder']/f"{config['model_filename']}{epoch}.pt")
